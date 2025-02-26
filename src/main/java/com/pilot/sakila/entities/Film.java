@@ -1,5 +1,6 @@
 package com.pilot.sakila.entities;
 
+import com.pilot.sakila.dto.response.PartialActorResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -52,6 +54,12 @@ public class Film {
     @ManyToMany(mappedBy = "films")
     @Getter(AccessLevel.NONE)
     private List<Category> categories;
+
+    public List<PartialActorResponse> getCast(){
+        return cast.stream()
+                .map(PartialActorResponse::from)
+                .collect(Collectors.toList());
+    }
 
 
 }

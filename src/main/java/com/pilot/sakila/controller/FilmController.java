@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,4 +75,48 @@ public class FilmController {
         final var savedFilm = filmRepository.save(film);
         return FilmResponse.from(savedFilm);
     }
+
+    @PatchMapping("/{id}")
+    public FilmResponse updateFilm(@PathVariable Short id, @RequestBody FilmRequest data){
+
+        Film film = filmRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No film with ID: " + id + " has been found"));
+
+        if(data.getTitle() != null){
+            film.setTitle(data.getTitle());
+        }
+
+        if(data.getDescription() != null){
+            film.setDescription(data.getDescription());
+        }
+
+        if(data.getLanguage_id() != null){
+            final var language = languageRepository.findById(data.getLanguage_id())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No language with that ID has been found"));
+
+            film.setLanguage(language);
+
+        }
+
+        if(data.getRelease_year() != null){
+            film.setReleaseYear(Year.of(data.getRelease_year()));
+        }
+
+        if(data.getLength() != null){
+            film.setLength(data.getLength());
+        }
+
+        if(data.getActorIds() != null && !data.getActorIds().isEmpty()){
+            final var cast = data.getActorIds().stream()
+                    .map(actorId -> actorRepository.findById(actorId)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No actor with ID: " + actorId + " has been found."))
+                    ).toList();
+            film.setCast(new ArrayList<>(cast));
+        }
+
+        Film updatedFilm = filmRepository.save(film);
+        return FilmResponse.from(updatedFilm);
+    }
+
+
 }

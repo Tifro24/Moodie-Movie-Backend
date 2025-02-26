@@ -1,6 +1,7 @@
 package com.pilot.sakila.entities;
 
 import com.pilot.sakila.dto.response.PartialActorResponse;
+import com.pilot.sakila.enums.Rating;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -41,21 +43,23 @@ public class Film {
     @JoinColumn(name = "original_language_id", referencedColumnName = "language_id")
     private Language originalLanguage;
 
-    @Column(name = "rental_duration")
-    private Byte rentalDuration;
-
-    @Column(name = "rental_rate")
-    private BigDecimal rentalRate;
-
     @Column(name = "length")
     private Short length;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rating")
+    private Rating rating;
 
     @ManyToMany(mappedBy = "films")
     @Getter(AccessLevel.NONE)
     private List<Actor> cast;
 
-    @ManyToMany(mappedBy = "films")
-    @Getter(AccessLevel.NONE)
+    @ManyToMany
+    @JoinTable(
+            name = "film_category",
+            joinColumns = {@JoinColumn(name = "film_id")},
+            inverseJoinColumns = {@JoinColumn(name = "category_id")}
+    )
     private List<Category> categories;
 
     public List<PartialActorResponse> getCast(){
@@ -63,6 +67,8 @@ public class Film {
                 .map(PartialActorResponse::from)
                 .collect(Collectors.toList());
     }
+
+
 
 
 }

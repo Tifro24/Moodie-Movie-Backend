@@ -4,17 +4,17 @@ package com.pilot.sakila.controller;
 import com.pilot.sakila.dto.request.FilmRequest;
 import com.pilot.sakila.dto.response.FilmResponse;
 import com.pilot.sakila.entities.Film;
-import com.pilot.sakila.repository.ActorRepository;
-import com.pilot.sakila.repository.FilmRepository;
-import com.pilot.sakila.repository.LanguageRepository;
+import com.pilot.sakila.repository.*;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,12 +26,22 @@ public class FilmController {
     private final ActorRepository actorRepository;
     private final FilmRepository filmRepository;
     private final LanguageRepository languageRepository;
+    private final FilmActorRepository filmActorRepository;
+    private final CategoryRepository categoryRepository;
+    private final FilmTextRepository filmTextRepository;
 
     @Autowired
-    public FilmController(FilmRepository filmRepository, ActorRepository actorRepository, LanguageRepository languageRepository){
+    public FilmController(FilmRepository filmRepository, ActorRepository actorRepository,
+                          LanguageRepository languageRepository,
+                          FilmActorRepository filmActorRepository,
+                          CategoryRepository categoryRepository,
+                          FilmTextRepository filmTextRepository) {
         this.filmRepository = filmRepository;
         this.actorRepository = actorRepository;
         this.languageRepository = languageRepository;
+        this.filmActorRepository = filmActorRepository;
+        this.categoryRepository = categoryRepository;
+        this.filmTextRepository = filmTextRepository;
     }
 
     @GetMapping
@@ -45,7 +55,7 @@ public class FilmController {
                 .toList();
     }
 
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     public FilmResponse getFilmById(@PathVariable Short id){
         return filmRepository.findById(id)
                 .map(FilmResponse::from)
@@ -65,6 +75,10 @@ public class FilmController {
         film.setLanguage(language);
 
         film.setLength(data.getLength());
+        film.setRating(data.getRating());
+
+        final var categories = categoryRepository.findAllById(data.getCategoryIds());
+        film.setCategories(new ArrayList<>(categories));
 
         final var cast = data.getActorIds().stream()
                 .map(actorId -> actorRepository.findById(actorId)
@@ -106,6 +120,19 @@ public class FilmController {
             film.setLength(data.getLength());
         }
 
+        if(data.getRating() != null){
+            film.setRating(data.getRating());
+        }
+
+        if(data.getCategoryIds() != null && !data.getCategoryIds().isEmpty()){
+            final var categories = data.getCategoryIds().stream()
+                    .map(categoryId -> categoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No category with id: " + categoryId + " has been found"))
+                    ).toList();
+            film.setCategories(new ArrayList<>(categories));
+        }
+
+
         if(data.getActorIds() != null && !data.getActorIds().isEmpty()){
             final var cast = data.getActorIds().stream()
                     .map(actorId -> actorRepository.findById(actorId)
@@ -116,6 +143,22 @@ public class FilmController {
 
         Film updatedFilm = filmRepository.save(film);
         return FilmResponse.from(updatedFilm);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFilm(@PathVariable Short id){
+        if(!filmRepository.existsById(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No film with id: " + id + " has been found");
+        }
+
+        filmActorRepository.deleteByFilmId(id);
+
+        filmTextRepository.deleteByFilmId(id);
+
+        filmRepository.deleteById(id);
+
+        return ResponseEntity.ok("Film with id: " + id + " has been successfully deleted");
+
     }
 
 

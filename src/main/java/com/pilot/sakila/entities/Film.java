@@ -4,6 +4,7 @@ import com.pilot.sakila.dto.response.PartialActorResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "film")
 @Getter
+@Setter
 
 
 public class Film {
@@ -30,6 +32,7 @@ public class Film {
 
     @Column(name = "release_year")
     private Year releaseYear;
+
     @ManyToOne
     @JoinColumn(name = "language_id", referencedColumnName = "language_id")
     private Language language;

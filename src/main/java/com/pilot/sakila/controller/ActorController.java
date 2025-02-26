@@ -50,7 +50,7 @@ public class ActorController {
     }
 
     @GetMapping("/{id}")
-    public ActorResponse listActors(@PathVariable Short id){
+    public ActorResponse getActorById(@PathVariable Short id){
         return actorRepository.findById(id)
                 .map(ActorResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"This id does not exist within the database"));
@@ -72,9 +72,7 @@ public class ActorController {
 
         actor.setFilms(films);
         final var savedActor = actorRepository.save(actor);
-        final var newActor = actorRepository.findById(savedActor.getId())
-                .orElseThrow(() -> new RuntimeException("Expected an actor name"));
-        return ActorResponse.from(newActor);
+        return ActorResponse.from(savedActor);
     }
 
     @PatchMapping("/{id}")

@@ -46,11 +46,16 @@ public class Film {
     @Column(name = "length")
     private Short length;
 
-    @Enumerated(EnumType.STRING)
+
     @Column(name = "rating")
     private Rating rating;
 
-    @ManyToMany(mappedBy = "films")
+    @ManyToMany
+    @JoinTable(
+            name = "film_actor",
+            joinColumns = {@JoinColumn(name = "film_id")},
+            inverseJoinColumns = {@JoinColumn(name = "actor_id")}
+    )
     @Getter(AccessLevel.NONE)
     private List<Actor> cast;
 

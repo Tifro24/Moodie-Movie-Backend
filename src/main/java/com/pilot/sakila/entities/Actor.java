@@ -33,13 +33,7 @@ public class Actor {
     @Setter(AccessLevel.NONE)
     private String fullName;
 
-    @ManyToMany
-    @JoinTable(
-            name = "film_actor",
-            joinColumns = {@JoinColumn(name = "actor_id")},
-            inverseJoinColumns = {@JoinColumn(name = "film_id")}
-    )
-
+    @ManyToMany(mappedBy = "cast")
 
     private List<Film> films = new ArrayList<>();
 

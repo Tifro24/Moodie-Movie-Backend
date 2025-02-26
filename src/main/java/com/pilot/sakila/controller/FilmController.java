@@ -3,6 +3,8 @@ package com.pilot.sakila.controller;
 
 import com.pilot.sakila.dto.request.FilmRequest;
 import com.pilot.sakila.dto.response.FilmResponse;
+import com.pilot.sakila.dto.response.PartialActorResponse;
+import com.pilot.sakila.entities.Actor;
 import com.pilot.sakila.entities.Film;
 import com.pilot.sakila.repository.*;
 import lombok.Getter;
@@ -85,7 +87,7 @@ public class FilmController {
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No actor with ID: " + actorId + " has been found"))
                             ).toList();
 
-        film.setCast(cast);
+        film.setCast(new ArrayList<>(cast));
         final var savedFilm = filmRepository.save(film);
         return FilmResponse.from(savedFilm);
     }
@@ -134,11 +136,22 @@ public class FilmController {
 
 
         if(data.getActorIds() != null && !data.getActorIds().isEmpty()){
-            final var cast = data.getActorIds().stream()
+
+            final var castToAdd = data.getActorIds().stream()
                     .map(actorId -> actorRepository.findById(actorId)
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No actor with ID: " + actorId + " has been found."))
-                    ).toList();
-            film.setCast(new ArrayList<>(cast));
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No actor with id: " + actorId + " has been found."))
+                    ).collect(Collectors.toList());
+
+            List<Actor> currentCast = film.getCast().stream()
+                    .map(partialActorResponse -> actorRepository.findById(partialActorResponse.getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "JNFKJNF SJF K"))
+                    ).collect(Collectors.toList());
+
+            castToAdd.stream()
+                    .filter(actor -> currentCast.stream().noneMatch(a -> a.getId() == actor.getId()))
+                    .forEach(currentCast::add);
+
+            film.setCast(currentCast);
         }
 
         Film updatedFilm = filmRepository.save(film);

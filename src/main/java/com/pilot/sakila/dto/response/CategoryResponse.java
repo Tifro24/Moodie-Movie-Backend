@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class CategoryResponse {
-    private final String name;
+    private final String genre;
 }

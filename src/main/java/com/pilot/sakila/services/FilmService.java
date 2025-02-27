@@ -44,22 +44,19 @@ public class FilmService {
         this.filmTextRepository = filmTextRepository;
     }
 
-    public List<FilmResponse> getAllFilms(Optional<String> title){
+    public List<Film> getAllFilms(Optional<String> title){
         return title
                 .map(filmRepository::findByTitleContainingIgnoreCase)
-                .orElseGet(filmRepository::findAll)
-                .stream()
-                .map(FilmResponse::from)
-                .toList();
+                .orElseGet(filmRepository::findAll);
+
     }
 
-    public FilmResponse getFilmById(Short id){
+    public Film getFilmById(Short id){
         return filmRepository.findById(id)
-                .map(FilmResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A film with this ID does not exist"));
     }
 
-    public FilmResponse createFilm(String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
+    public Film createFilm(String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
         final var film = new Film();
         film.setTitle(title);
         film.setDescription(description);
@@ -82,11 +79,10 @@ public class FilmService {
                 ).toList();
 
         film.setCast(new ArrayList<>(cast));
-        final var savedFilm = filmRepository.save(film);
-        return FilmResponse.from(savedFilm);
+        return filmRepository.save(film);
     }
 
-    public FilmResponse updateFilm(Short id, String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
+    public Film updateFilm(Short id, String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
 
         Film film = filmRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No film with ID: " + id + " has been found"));
@@ -147,8 +143,8 @@ public class FilmService {
             film.setCast(currentCast);
         }
 
-        Film updatedFilm = filmRepository.save(film);
-        return FilmResponse.from(updatedFilm);
+        return filmRepository.save(film);
+
     }
 
     public void deleteFilm(Short id){

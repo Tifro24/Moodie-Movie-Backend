@@ -32,29 +32,26 @@ public class ActorService {
             this.filmActorRepository = filmActorRepository;
         }
 
-    public List<ActorResponse> listActors(Optional<String> name){
+    public List<Actor> listActors(Optional<String> name){
 
         return name
                 .map(actorRepository::findByFullNameContainingIgnoreCase)
-                .orElseGet(actorRepository::findAll)
-                .stream()
-                .map(ActorResponse:: from)
-                .toList();
+                .orElseGet(actorRepository::findAll);
+
 
     }
 
-    public ActorResponse getActorById(Short id){
+    public Actor getActorById(Short id){
         return actorRepository.findById(id)
-                .map(ActorResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"This id does not exist within the database"));
     }
 
-    public ActorResponse createActor(ActorRequest data){
+    public Actor createActor(String firstName, String lastName, List<Short> filmIds){
         final var actor = new Actor();
-        actor.setFirstName(data.getFirstName());
-        actor.setLastName(data.getLastName());
+        actor.setFirstName(firstName);
+        actor.setLastName(lastName);
 
-        final var films = data.getFilmIds()
+        final var films = filmIds
                 .stream()
                 .map(filmId -> filmRepository
                         .findById(filmId)
@@ -63,24 +60,24 @@ public class ActorService {
 
 
         actor.setFilms(films);
-        final var savedActor = actorRepository.save(actor);
-        return ActorResponse.from(savedActor);
+        return actorRepository.save(actor);
+
     }
 
-    public ActorResponse updateActor(@Validated(ValidationGroup.Update.class)@PathVariable Short id, @RequestBody ActorRequest data){
+    public Actor updateActor(Short id, String firstName, String lastName, List<Short> filmIds){
 
         Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Actor with id " + id + "not found"));
 
-        if(data.getFirstName() != null){
-            actor.setFirstName(data.getFirstName());
+        if(firstName != null){
+            actor.setFirstName(firstName);
         }
 
-        if(data.getLastName() != null){
-            actor.setLastName(data.getLastName());
+        if(lastName != null){
+            actor.setLastName(lastName);
         }
 
-        if(data.getFilmIds() != null && !data.getFilmIds().isEmpty()){
-            final var films = data.getFilmIds()
+        if(filmIds != null && !filmIds.isEmpty()){
+            final var films = filmIds
                     .stream()
                     .map(filmId -> filmRepository
                             .findById(filmId)
@@ -88,8 +85,8 @@ public class ActorService {
                     ).toList();
             actor.setFilms(new ArrayList<>(films));
         }
-        Actor updatedActor = actorRepository.save(actor);
-        return ActorResponse.from(updatedActor);
+        return actorRepository.save(actor);
+
     }
 
     public void deleteActor(@PathVariable Short id){

@@ -2,9 +2,7 @@ package com.pilot.sakila.entities;
 
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Formula;
 
@@ -15,6 +13,8 @@ import java.util.List;
 @Table(name="actor")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 
 public class Actor {
     @Id

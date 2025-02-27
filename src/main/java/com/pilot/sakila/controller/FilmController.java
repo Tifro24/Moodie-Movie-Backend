@@ -4,6 +4,7 @@ package com.pilot.sakila.controller;
 
 import com.pilot.sakila.dto.request.FilmRequest;
 import com.pilot.sakila.dto.response.FilmResponse;
+import com.pilot.sakila.entities.Film;
 import com.pilot.sakila.enums.Rating;
 import com.pilot.sakila.services.FilmService;
 import jakarta.validation.constraints.*;
@@ -35,12 +36,14 @@ public class FilmController {
 
     @GetMapping
     public List<FilmResponse> getAllFilms(@RequestParam(required = false) Optional<String> title){
-        return filmService.getAllFilms(title);
+        final var films = filmService.getAllFilms(title);
+        return films.stream().map(FilmResponse::from).toList();
     }
 
     @GetMapping("/{id}")
     public FilmResponse getFilmById(@PathVariable Short id){
-        return filmService.getFilmById(id);
+        final var film = filmService.getFilmById(id);
+        return FilmResponse.from(film);
     }
 
     @PostMapping
@@ -52,7 +55,8 @@ public class FilmController {
                                    @RequestParam @NotNull Rating rating,
                                    @RequestParam @NotEmpty List<Short> categoryIds,
                                    @RequestParam @NotEmpty List<Short> actorIds){
-       return filmService.createFilm(title, description, releaseYear, languageId, length, rating, categoryIds, actorIds);
+       final var film = filmService.createFilm(title, description, releaseYear, languageId, length, rating, categoryIds, actorIds);
+       return FilmResponse.from(film);
     }
 
     @PatchMapping("/{id}")
@@ -65,7 +69,8 @@ public class FilmController {
                                    @RequestParam(required = false) @NotNull Rating rating,
                                    @RequestParam(required = false) @NotEmpty List<Short> categoryIds,
                                    @RequestParam(required = false) @NotEmpty List<Short> actorIds){
-        return filmService.updateFilm(id, title, description, releaseYear, languageId, length, rating, categoryIds, actorIds);
+        final var film = filmService.updateFilm(id, title, description, releaseYear, languageId, length, rating, categoryIds, actorIds);
+        return FilmResponse.from(film);
     }
 
     @DeleteMapping("/{id}")

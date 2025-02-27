@@ -29,10 +29,10 @@ public class FilmRequest {
     @NotNull(groups = {Create.class})
     @Min(value = 1901, groups = Create.class)
     @Max(value = 2150, groups = Create.class)
-    private final Short release_year;
+    private final Short releaseYear;
 
     @NotNull(groups = {Create.class})
-    private final Short language_id;
+    private final Short languageId;
 
     @NotNull(groups = {Create.class})
     @Min(value = 1, groups = Create.class)

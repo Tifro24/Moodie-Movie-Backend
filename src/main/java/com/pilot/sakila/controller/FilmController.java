@@ -4,7 +4,9 @@ package com.pilot.sakila.controller;
 
 import com.pilot.sakila.dto.request.FilmRequest;
 import com.pilot.sakila.dto.response.FilmResponse;
+import com.pilot.sakila.enums.Rating;
 import com.pilot.sakila.services.FilmService;
+import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,13 +44,28 @@ public class FilmController {
     }
 
     @PostMapping
-    public FilmResponse createFilm(@RequestBody @Validated(Create.class) FilmRequest data){
-       return filmService.createFilm(data);
+    public FilmResponse createFilm(@RequestParam @NotBlank String title,
+                                   @RequestParam @NotBlank String description,
+                                   @RequestParam @Min(1901) @Max(2150) Short releaseYear,
+                                   @RequestParam @NotNull Short languageId,
+                                   @RequestParam @Min(1) Short length,
+                                   @RequestParam @NotNull Rating rating,
+                                   @RequestParam @NotEmpty List<Short> categoryIds,
+                                   @RequestParam @NotEmpty List<Short> actorIds){
+       return filmService.createFilm(title, description, releaseYear, languageId, length, rating, categoryIds, actorIds);
     }
 
     @PatchMapping("/{id}")
-    public FilmResponse updateFilm(@PathVariable Short id, @RequestBody @Validated(Update.class) FilmRequest data){
-        return filmService.updateFilm(id, data);
+    public FilmResponse updateFilm(@PathVariable Short id,
+                                   @RequestParam(required = false) @Size(min=1, max=45) String title,
+                                   @RequestParam(required = false) @Size(min=1) String description,
+                                   @RequestParam(required = false) @Min(1901) @Max(2150) Short releaseYear,
+                                   @RequestParam(required = false) @NotNull Short languageId,
+                                   @RequestParam(required = false) @Min(1) Short length,
+                                   @RequestParam(required = false) @NotNull Rating rating,
+                                   @RequestParam(required = false) @NotEmpty List<Short> categoryIds,
+                                   @RequestParam(required = false) @NotEmpty List<Short> actorIds){
+        return filmService.updateFilm(id, title, description, releaseYear, languageId, length, rating, categoryIds, actorIds);
     }
 
     @DeleteMapping("/{id}")

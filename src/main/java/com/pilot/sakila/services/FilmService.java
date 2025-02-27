@@ -5,6 +5,7 @@ import com.pilot.sakila.dto.request.FilmRequest;
 import com.pilot.sakila.dto.response.FilmResponse;
 import com.pilot.sakila.entities.Actor;
 import com.pilot.sakila.entities.Film;
+import com.pilot.sakila.enums.Rating;
 import com.pilot.sakila.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,24 +59,24 @@ public class FilmService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A film with this ID does not exist"));
     }
 
-    public FilmResponse createFilm(FilmRequest data){
+    public FilmResponse createFilm(String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
         final var film = new Film();
-        film.setTitle(data.getTitle());
-        film.setDescription(data.getDescription());
-        film.setReleaseYear(Year.of(data.getRelease_year()));
+        film.setTitle(title);
+        film.setDescription(description);
+        film.setReleaseYear(Year.of(releaseYear));
 
-        final var language = languageRepository.findById(data.getLanguage_id())
+        final var language = languageRepository.findById(languageId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is not a language with this Id"));
 
         film.setLanguage(language);
 
-        film.setLength(data.getLength());
-        film.setRating(data.getRating());
+        film.setLength(length);
+        film.setRating(rating);
 
-        final var categories = categoryRepository.findAllById(data.getCategoryIds());
+        final var categories = categoryRepository.findAllById(categoryIds);
         film.setCategories(new ArrayList<>(categories));
 
-        final var cast = data.getActorIds().stream()
+        final var cast = actorIds.stream()
                 .map(actorId -> actorRepository.findById(actorId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No actor with ID: " + actorId + " has been found"))
                 ).toList();
@@ -85,41 +86,41 @@ public class FilmService {
         return FilmResponse.from(savedFilm);
     }
 
-    public FilmResponse updateFilm(Short id,  FilmRequest data){
+    public FilmResponse updateFilm(Short id, String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
 
         Film film = filmRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No film with ID: " + id + " has been found"));
 
-        if(data.getTitle() != null){
-            film.setTitle(data.getTitle());
+        if(title != null){
+            film.setTitle(title);
         }
 
-        if(data.getDescription() != null){
-            film.setDescription(data.getDescription());
+        if(description != null){
+            film.setDescription(description);
         }
 
-        if(data.getLanguage_id() != null){
-            final var language = languageRepository.findById(data.getLanguage_id())
+        if(languageId != null){
+            final var language = languageRepository.findById(languageId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No language with that ID has been found"));
 
             film.setLanguage(language);
 
         }
 
-        if(data.getRelease_year() != null){
-            film.setReleaseYear(Year.of(data.getRelease_year()));
+        if(releaseYear != null){
+            film.setReleaseYear(Year.of(releaseYear));
         }
 
-        if(data.getLength() != null){
-            film.setLength(data.getLength());
+        if(length != null){
+            film.setLength(length);
         }
 
-        if(data.getRating() != null){
-            film.setRating(data.getRating());
+        if(rating != null){
+            film.setRating(rating);
         }
 
-        if(data.getCategoryIds() != null && !data.getCategoryIds().isEmpty()){
-            final var categories = data.getCategoryIds().stream()
+        if(categoryIds!= null && !categoryIds.isEmpty()){
+            final var categories = categoryIds.stream()
                     .map(categoryId -> categoryRepository.findById(categoryId)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No category with id: " + categoryId + " has been found"))
                     ).toList();
@@ -127,12 +128,12 @@ public class FilmService {
         }
 
 
-        if(data.getActorIds() != null && !data.getActorIds().isEmpty()){
+        if(actorIds != null && !actorIds.isEmpty()){
 
-            final var castToAdd = data.getActorIds().stream()
+            final var castToAdd = actorIds.stream()
                     .map(actorId -> actorRepository.findById(actorId)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No actor with id: " + actorId + " has been found."))
-                    ).collect(Collectors.toList());
+                    ).toList();
 
             List<Actor> currentCast = film.getCast().stream()
                     .map(partialActorResponse -> actorRepository.findById(partialActorResponse.getId())

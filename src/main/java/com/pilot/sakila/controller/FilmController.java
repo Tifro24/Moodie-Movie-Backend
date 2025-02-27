@@ -1,6 +1,7 @@
 package com.pilot.sakila.controller;
 
 
+import com.pilot.sakila.dto.ValidationGroup;
 import com.pilot.sakila.dto.request.FilmRequest;
 import com.pilot.sakila.dto.response.FilmResponse;
 import com.pilot.sakila.dto.response.PartialActorResponse;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.pilot.sakila.dto.ValidationGroup.*;
 
 @RestController
 @RequestMapping("/films")
@@ -65,7 +69,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public FilmResponse createFilm(@RequestBody FilmRequest data){
+    public FilmResponse createFilm(@RequestBody @Validated(Create.class) FilmRequest data){
         final var film = new Film();
         film.setTitle(data.getTitle());
         film.setDescription(data.getDescription());
@@ -93,7 +97,7 @@ public class FilmController {
     }
 
     @PatchMapping("/{id}")
-    public FilmResponse updateFilm(@PathVariable Short id, @RequestBody FilmRequest data){
+    public FilmResponse updateFilm(@PathVariable Short id, @RequestBody @Validated(Update.class) FilmRequest data){
 
         Film film = filmRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No film with ID: " + id + " has been found"));

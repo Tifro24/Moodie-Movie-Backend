@@ -32,6 +32,7 @@ public class ActorService {
             this.filmActorRepository = filmActorRepository;
         }
 
+
     public List<Actor> listActors(Optional<String> name){
 
         return name
@@ -40,7 +41,6 @@ public class ActorService {
 
 
     }
-
     public Actor getActorById(Short id){
         return actorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"This id does not exist within the database"));

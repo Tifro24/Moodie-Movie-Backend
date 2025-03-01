@@ -3,6 +3,7 @@ package com.pilot.sakila.dto;
 import com.pilot.sakila.controller.ActorController;
 import com.pilot.sakila.dto.response.ActorResponse;
 import com.pilot.sakila.entities.Actor;
+import com.pilot.sakila.entities.Film;
 import com.pilot.sakila.services.ActorService;
 import org.apache.coyote.Response;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.Null;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -119,7 +121,7 @@ public class ActorControllerTest {
     public void createActorsReturnActorResponseOfCreatedActor(){
         Actor actorToBeCreated = new Actor((short) 6, "Naruto", "Uzumaki", "Naruto Uzumaki", List.of());
 
-        doReturn(actorToBeCreated).when(service).createActor(anyString(), anyString(), anyList());
+        doReturn(actorToBeCreated).when(service).createActor("Naruto", "Uzumaki", List.of());
 
         ActorResponse actualActor = controller.createActor("Naruto", "Uzumaki", List.of());
 
@@ -127,21 +129,40 @@ public class ActorControllerTest {
         Assertions.assertEquals(actorToBeCreated.getId(), actualActor.getId());
         Assertions.assertEquals(actorToBeCreated.getFirstName(), actualActor.getFirstName());
         Assertions.assertEquals(actorToBeCreated.getLastName(), actualActor.getLastName());
+
+        verify(service).createActor("Naruto", "Uzumaki", List.of());
     }
 
     @Test
     public void updateActorUpdatedReturnActorResponseOfUpdatedActor(){
          Actor actorToUpdate = actors.get(0);
 
-         actorToUpdate.setFirstName("Terrence");
+         Actor expectedUpdatedActor = new Actor(actorToUpdate.getId(), "Terrence", actorToUpdate.getLastName(), actorToUpdate.getFullName(), actorToUpdate.getFilms());
 
-         doReturn(actorToUpdate).when(service).updateActor(actorToUpdate.getId(), "Terrence", (null), (null));
+         doReturn(expectedUpdatedActor).when(service).updateActor(expectedUpdatedActor.getId(), "Terrence", null, null);
 
-         ActorResponse actualUpdatedActor = controller.updateActor((short) 1, "Terrence",(null), (null));
+         ActorResponse actualUpdatedActor = controller.updateActor((short) 1, "Terrence",null, null);
 
          assertNotNull(actualUpdatedActor);
-         Assertions.assertEquals(actorToUpdate.getId(), actualUpdatedActor.getId());
-         Assertions.assertEquals("Terrence", actualUpdatedActor.getFirstName());
-         Assertions.assertEquals(actorToUpdate.getLastName(), actualUpdatedActor.getLastName());
+         Assertions.assertEquals(expectedUpdatedActor.getId(), actualUpdatedActor.getId());
+         Assertions.assertEquals(expectedUpdatedActor.getFirstName(), actualUpdatedActor.getFirstName());
+         Assertions.assertEquals(expectedUpdatedActor.getLastName(), actualUpdatedActor.getLastName());
     }
+
+    @Test
+    public void deleteActorDeletesActorGivenValidActorId(){
+        Short actorToDeleteId = (short)2;
+        ResponseEntity<String> expectedMessage = ResponseEntity.ok("Actor with id: " + actorToDeleteId + " has been successfully deleted");;
+
+
+        ResponseEntity<String> actualMessage = controller.deleteActor(actorToDeleteId);
+
+        assertNotNull(actualMessage);
+        Assertions.assertEquals(expectedMessage.getStatusCode(), actualMessage.getStatusCode());
+        Assertions.assertEquals(expectedMessage, actualMessage);
+    }
+
+
+
+
 }

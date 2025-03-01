@@ -3,9 +3,7 @@ package com.pilot.sakila.entities;
 import com.pilot.sakila.dto.response.PartialActorResponse;
 import com.pilot.sakila.enums.Rating;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -18,7 +16,8 @@ import java.util.stream.Collectors;
 @Table(name = "film")
 @Getter
 @Setter
-
+@AllArgsConstructor
+@NoArgsConstructor
 
 public class Film {
     @Id

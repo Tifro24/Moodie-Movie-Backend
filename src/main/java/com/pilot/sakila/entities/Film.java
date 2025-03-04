@@ -1,5 +1,7 @@
 package com.pilot.sakila.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pilot.sakila.dto.response.PartialActorResponse;
 import com.pilot.sakila.enums.Rating;
 import jakarta.persistence.*;
@@ -58,12 +60,8 @@ public class Film {
     @Getter(AccessLevel.NONE)
     private List<Actor> cast;
 
-    @ManyToMany
-    @JoinTable(
-            name = "film_category",
-            joinColumns = {@JoinColumn(name = "film_id")},
-            inverseJoinColumns = {@JoinColumn(name = "category_id")}
-    )
+    @JsonIgnore
+    @ManyToMany(mappedBy = "films")
     private List<Category> categories;
 
     public List<PartialActorResponse> getCast(){

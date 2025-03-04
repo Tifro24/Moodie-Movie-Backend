@@ -10,6 +10,7 @@ import com.pilot.sakila.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+@Service
 public class FilmService {
     private final ActorRepository actorRepository;
     private final FilmRepository filmRepository;
@@ -31,6 +32,7 @@ public class FilmService {
     private final FilmTextRepository filmTextRepository;
 
     @Autowired
+
     public FilmService(FilmRepository filmRepository, ActorRepository actorRepository,
                           LanguageRepository languageRepository,
                           FilmActorRepository filmActorRepository,
@@ -54,6 +56,11 @@ public class FilmService {
     public Film getFilmById(Short id){
         return filmRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A film with this ID does not exist"));
+    }
+
+    public List<Film> getFilmsByGenres(List<String> genres) {
+        return filmRepository.findFilmsByGenres(genres);
+
     }
 
     public Film createFilm(String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){

@@ -14,9 +14,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
-
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 import static com.pilot.sakila.dto.ValidationGroup.*;
@@ -44,6 +46,31 @@ public class FilmController {
     public FilmResponse getFilmById(@PathVariable Short id){
         final var film = filmService.getFilmById(id);
         return FilmResponse.from(film);
+    }
+
+    @GetMapping("/byMood")
+    public List<FilmResponse> getMoviesByMood(@RequestParam String mood) {
+
+        List<String> genres = mapGenresToMood(mood);
+
+        List<Film> films = filmService.getFilmsByGenres(genres);
+
+        return films.stream()
+                .map(FilmResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> mapGenresToMood(String mood) {
+        switch (mood.toLowerCase()) {
+            case "happy": return Arrays.asList("Comedy", "Family");
+            case "sad" : return Arrays.asList("Drama", "Romance");
+            case "adventurous" : return Arrays.asList("Action", "Adventure");
+            case "romantic" : return Arrays.asList("Romance", "Drama");
+            case "funny" : return Arrays.asList("Comedy");
+            case "excited" : return Arrays.asList("Action", "Adventure");
+            case "scary" : return Arrays.asList("Horror", "Thriller");
+            default: return Collections.emptyList();
+        }
     }
 
     @PostMapping

@@ -1,6 +1,8 @@
 package com.pilot.sakila.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +23,26 @@ public class Category {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(mappedBy = "categories")
+
+    @ManyToMany
+    @JoinTable(
+            name = "film_category",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "film_id")
+    )
+
     private List<Film> films;
+
+    @JsonIgnore
+    @ManyToMany
+
+    @JoinTable(
+            name = "preferences_category",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "preference_id")
+    )
+
+    private List<Preferences> preferences;
 
 
 }

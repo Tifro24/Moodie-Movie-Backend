@@ -60,6 +60,15 @@ public class FilmController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/byGenre")
+    public List<FilmResponse> getMoviesByGenre(@RequestParam String genre) {
+        List<Film> films = filmService.getFilmsByCategoryName(genre);
+        return films.stream()
+                .map(FilmResponse::from)
+                .collect(Collectors.toList());
+    }
+
+
     private List<String> mapGenresToMood(String mood) {
         switch (mood.toLowerCase()) {
             case "happy": return Arrays.asList("Comedy", "Family");

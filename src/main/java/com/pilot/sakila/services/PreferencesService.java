@@ -22,19 +22,18 @@ public class PreferencesService {
         // Map the Preferences to CategoryResponseForPref to exclude category IDs and return films
         return preferences.stream()
                 .map(preference -> {
-                    // For each preference, get the genres (categories) and films related to it
-                    return preference.getGenres().stream() // Iterate over genres (categories)
+                    return preference.getGenres().stream()
                             .map(category -> new CategoryResponseForPref.CategoryResponse(
-                                    preference.getId(),  // Preference ID
-                                    preference.getMood(), // Mood (e.g., happy)
-                                    category.getName(),   // Category Name (e.g., Action)
-                                    category.getFilms().stream()  // Films related to the category
+                                    preference.getId(),
+                                    preference.getMood(),
+                                    category.getName(),
+                                    category.getFilms().stream()
                                             .map(film -> new CategoryResponseForPref.FilmResponse(film.getTitle(), film.getDescription()))
-                                            .collect(Collectors.toList())  // Collect films in a list
+                                            .collect(Collectors.toList())
                             ))
                             .collect(Collectors.toList());
                 })
-                .flatMap(Collection::stream) // Flatten the list of lists into a single list
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 

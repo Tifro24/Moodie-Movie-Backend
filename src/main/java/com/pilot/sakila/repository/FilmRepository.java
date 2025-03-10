@@ -12,4 +12,7 @@ public interface FilmRepository extends JpaRepository<Film, Short> {
 
     @Query("SELECT f FROM Film f JOIN f.categories c WHERE c.name IN :categories")
     List<Film> findFilmsByGenres(@Param("categories") List<String> categories);
+
+    @Query("SELECT f FROM Film f JOIN f.categories c WHERE c.name = :genre")
+    List<Film> findByCategoryName(@Param("genre") String genre);
 }

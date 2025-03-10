@@ -60,8 +60,12 @@ public class FilmService {
 
     public List<Film> getFilmsByGenres(List<String> genres) {
         return filmRepository.findFilmsByGenres(genres);
-
     }
+
+    public List<Film> getFilmsByCategoryName(String genre) {
+        return filmRepository.findByCategoryName(genre);
+    }
+
 
     public Film createFilm(String title, String description, Short releaseYear, Short languageId, Short length, Rating rating, List<Short> categoryIds, List<Short> actorIds){
         final var film = new Film();

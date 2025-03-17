@@ -22,14 +22,17 @@ public class Preferences {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Short id;
 
+    @Column(name = "mood")
     private String mood;
 
 
     @ManyToMany(mappedBy = "preferences")
     private List<Category> genres;
 
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
 }

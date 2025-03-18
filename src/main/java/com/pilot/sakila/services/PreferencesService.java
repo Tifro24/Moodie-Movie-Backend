@@ -40,4 +40,8 @@ public class PreferencesService {
     public Preferences savePreference(Preferences preference){
         return preferencesRepository.save(preference);
     }
+
+    public List<Preferences> getAllMoods(){
+        return preferencesRepository.findAll();
+    }
 }

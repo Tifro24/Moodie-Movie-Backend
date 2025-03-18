@@ -70,6 +70,9 @@ public class Film {
                 .collect(Collectors.toList());
     }
 
+    @ManyToMany(mappedBy = "films")
+    private List<Watchlist> watchlists;
+
 
 
 

@@ -19,6 +19,13 @@ public class PreferencesController {
         return preferencesService.getPreferencesByMood(mood);
     }
 
+    @GetMapping
+    public List<Preferences> getAllMoods(){
+        return preferencesService.getAllMoods();
+    }
+
+
+
     @PostMapping Preferences createPreference(@RequestBody Preferences preference) {
         return preferencesService.savePreference(preference);
     }

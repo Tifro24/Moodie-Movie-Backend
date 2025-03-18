@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +25,7 @@ public class Watchlist {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "preference_id", referencedColumnName = "id" , nullable = false)
+    @JoinColumn(name = "mood_id", referencedColumnName = "id" , nullable = false)
     private Preferences mood;
 
     @ManyToMany
@@ -33,7 +34,10 @@ public class Watchlist {
             joinColumns = @JoinColumn(name = "watchlist_id"),
             inverseJoinColumns = @JoinColumn(name = "film_id")
     )
-    private List<Film> films;
+    private List<Film> films = new ArrayList<>();
+
+    @Column(name = "session_id", nullable = false)
+    private String sessionId;
 
 
 }

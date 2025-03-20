@@ -25,7 +25,6 @@ public class PreferencesController {
     }
 
 
-
     @PostMapping Preferences createPreference(@RequestBody Preferences preference) {
         return preferencesService.savePreference(preference);
     }

@@ -48,7 +48,7 @@ public class WatchlistService {
             sessionId = UUID.randomUUID().toString();
         }
 
-        boolean watchlistExists = watchlistRepository.existsBySessionIdAndName(sessionId, name);
+        boolean watchlistExists = watchlistRepository.existsBySessionIdAndNameIgnoreCase(sessionId, name);
 
         if (watchlistExists) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A watchlist with this name already exists.");
@@ -69,8 +69,11 @@ public class WatchlistService {
     }
 
     public Watchlist addFilmToWatchlist(Short watchlistId, Short filmId){
+        System.out.println("Received request to add film ID " + filmId + " to watchlist ID " + watchlistId);
+
         Watchlist watchlist = watchlistRepository.findById(watchlistId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Watchlist not found"));
+
 
         Film film = filmRepository.findById(filmId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found"));

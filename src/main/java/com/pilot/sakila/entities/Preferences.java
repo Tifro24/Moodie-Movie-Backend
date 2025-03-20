@@ -28,7 +28,7 @@ public class Preferences {
     @Column(name = "mood")
     private String mood;
 
-
+    @JsonIgnore
     @ManyToMany(mappedBy = "preferences")
     private List<Category> genres;
 

@@ -8,5 +8,5 @@ import java.util.List;
 public interface WatchlistRepository extends JpaRepository<Watchlist, Short> {
     List<Watchlist> findByMoodId(Short moodId); // Get watchlists by mood
     List<Watchlist> findBySessionId(String sessionId);
-    boolean existsBySessionIdAndName(String sessionId, String name);
+    boolean existsBySessionIdAndNameIgnoreCase(String sessionId, String name);
 }

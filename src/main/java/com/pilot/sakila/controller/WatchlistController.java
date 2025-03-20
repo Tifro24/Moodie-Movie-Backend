@@ -55,8 +55,8 @@ public class WatchlistController {
         return films.stream().map(MiniFilmResponse::from).collect(Collectors.toList());
     }
 
-    @PostMapping("/{watchlistId}/add-film")
-    public WatchlistResponse addFilmToWatchlist(@PathVariable Short watchlistId, @RequestParam Short filmId) {
+    @PostMapping("/{watchlistId}/add-film/{filmId}")
+    public WatchlistResponse addFilmToWatchlist(@PathVariable Short watchlistId, @PathVariable Short filmId) {
         Watchlist watchlist = watchlistService.addFilmToWatchlist(watchlistId, filmId);
         return WatchlistResponse.from(watchlist);
     }

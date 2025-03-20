@@ -35,7 +35,6 @@ public class Category {
 
     @JsonIgnore
     @ManyToMany
-
     @JoinTable(
             name = "preferences_category",
             joinColumns = @JoinColumn(name = "category_id"),

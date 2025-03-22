@@ -51,7 +51,7 @@ public class FilmController {
     @GetMapping("/byMood")
     public List<FilmResponse> getMoviesByMood(@RequestParam String mood) {
 
-        List<String> genres = mapGenresToMood(mood);
+        List<String> genres = filmService.mapGenresToMood(mood);
 
         List<Film> films = filmService.getFilmsByGenres(genres);
 
@@ -68,19 +68,6 @@ public class FilmController {
                 .collect(Collectors.toList());
     }
 
-
-    private List<String> mapGenresToMood(String mood) {
-        switch (mood.toLowerCase()) {
-            case "happy": return Arrays.asList("Comedy", "Family");
-            case "sad" : return Arrays.asList("Drama", "Romance");
-            case "adventurous" : return Arrays.asList("Action", "Adventure");
-            case "romantic" : return Arrays.asList("Romance", "Drama");
-            case "funny" : return Arrays.asList("Comedy");
-            case "excited" : return Arrays.asList("Action", "Adventure");
-            case "scary" : return Arrays.asList("Horror", "Thriller");
-            default: return Collections.emptyList();
-        }
-    }
 
     @PostMapping
     public FilmResponse createFilm(@RequestParam @NotBlank String title,

@@ -20,7 +20,7 @@ public class Actor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="actor_id")
-    @Setter(AccessLevel.NONE)
+    //@Setter(ACCESSLEVEL.NONE) was here removed it for testing logging in case anything breaks
     private short id;
 
     @Column(name="first_name")

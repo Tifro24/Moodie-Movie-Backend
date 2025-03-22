@@ -119,10 +119,40 @@ public class ActorServiceTest {
     @Test
     public void updateActorReturnsUpdatedActor(){
 
-        Actor updatedActor = actors.get(3);
-        updatedActor.setFirstName("Benji");
+        // Given
+        Short actorId = 3;
+        String updatedFirstName = "Benji";
+        String updatedLastName = "Okonkwo";
+        List<Short> filmIds = List.of((short) 1, (short) 2);
 
-        
+        // Create a modifiable copy of the actor to simulate existing one
+        Actor existingActor = new Actor(actorId, "Charles", "Owusu", "Charles Owusu", List.of());
+
+        // Create the updated actor we expect to get back
+        Actor expectedUpdatedActor = new Actor();
+        expectedUpdatedActor.setId(actorId);
+        expectedUpdatedActor.setFirstName(updatedFirstName);
+        expectedUpdatedActor.setLastName(updatedLastName);
+        expectedUpdatedActor.setFilms(List.of(films.get(0), films.get(1)));
+
+        // Mocks
+        when(actorRepository.findById(actorId)).thenReturn(Optional.of(existingActor));
+        when(filmRepository.findById((short) 1)).thenReturn(Optional.of(films.get(0)));
+        when(filmRepository.findById((short) 2)).thenReturn(Optional.of(films.get(1)));
+        when(actorRepository.save(any(Actor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        Actor actualUpdatedActor = service.updateActor(actorId, updatedFirstName, updatedLastName, filmIds);
+
+        // Then
+        assertThat(actualUpdatedActor).isNotNull();
+        assertThat(actualUpdatedActor.getId()).isEqualTo(actorId);
+        assertThat(actualUpdatedActor.getFirstName()).isEqualTo(updatedFirstName);
+        assertThat(actualUpdatedActor.getLastName()).isEqualTo(updatedLastName);
+        assertThat(actualUpdatedActor.getFilms()).usingRecursiveComparison().isEqualTo(List.of(films.get(0), films.get(1)));
+
+
+
     }
 
 

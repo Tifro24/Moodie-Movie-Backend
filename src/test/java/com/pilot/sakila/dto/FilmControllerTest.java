@@ -41,6 +41,8 @@ public class FilmControllerTest {
 
     );
 
+
+
     @BeforeAll
     public static void setup() {
 
@@ -161,5 +163,36 @@ public class FilmControllerTest {
     }
 
 
+    @Test
+    public void getMoviesByMoodReturnsFilmResponsesCorrespondingMood(){
+        String mood = "happy";
+        List<String> mockGenres = List.of("Comedy", "Family");
+        List<Film> mockFilms = List.of(films.get(1), films.get(2));
+        List<FilmResponse> expectedResponses = mockFilms.stream().map(FilmResponse::from).toList();
+
+        doReturn(mockGenres).when(service).mapGenresToMood(mood);
+        doReturn(mockFilms).when(service).getFilmsByGenres(mockGenres);
+
+        List<FilmResponse> actualResponses = controller.getMoviesByMood(mood);
+
+        assertNotNull(actualResponses);
+        assertEquals(expectedResponses.size(), actualResponses.size());
+        assertThat(actualResponses).usingRecursiveComparison().isEqualTo(expectedResponses);
+    }
+
+    @Test
+    public void getMoviesByGenreReturnsFilmResponsesCorrespondingGenre() {
+        String mockGenre = "Action";
+        List<Film> mockFilms = List.of(films.get(0), films.get(3));
+        List<FilmResponse> expectedFilms = mockFilms.stream().map(FilmResponse::from).toList();
+
+        doReturn(mockFilms).when(service).getFilmsByCategoryName(mockGenre);
+
+        List<FilmResponse> actualFilms = controller.getMoviesByGenre(mockGenre);
+
+        assertNotNull(actualFilms);
+        assertEquals(expectedFilms.size(), actualFilms.size());
+        assertThat(actualFilms).usingRecursiveComparison().isEqualTo(expectedFilms);
+    }
 
 }

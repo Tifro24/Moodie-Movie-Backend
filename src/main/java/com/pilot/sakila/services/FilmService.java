@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 @Service
 public class FilmService {
@@ -56,6 +54,19 @@ public class FilmService {
     public Film getFilmById(Short id){
         return filmRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A film with this ID does not exist"));
+    }
+
+    public List<String> mapGenresToMood(String mood) {
+        switch (mood.toLowerCase()) {
+            case "happy": return Arrays.asList("Comedy", "Family");
+            case "sad" : return Arrays.asList("Drama", "Romance");
+            case "adventurous" : return Arrays.asList("Action", "Adventure");
+            case "romantic" : return Arrays.asList("Romance", "Drama");
+            case "funny" : return Arrays.asList("Comedy");
+            case "excited" : return Arrays.asList("Action", "Adventure");
+            case "scary" : return Arrays.asList("Horror", "Thriller");
+            default: return Collections.emptyList();
+        }
     }
 
     public List<Film> getFilmsByGenres(List<String> genres) {

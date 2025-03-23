@@ -155,7 +155,7 @@ public class FilmService {
 
             List<Actor> currentCast = film.getCast().stream()
                     .map(partialActorResponse -> actorRepository.findById(partialActorResponse.getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "JNFKJNF SJF K"))
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Error converting to correct format"))
                     ).collect(Collectors.toList());
 
             castToAdd.stream()

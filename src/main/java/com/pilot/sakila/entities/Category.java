@@ -4,7 +4,9 @@ package com.pilot.sakila.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.List;
 @Table(name = "category")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 
 public class Category {
     @Id
@@ -42,6 +46,7 @@ public class Category {
     )
 
     private List<Preferences> preferences;
+
 
 
 }

@@ -15,7 +15,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.in;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -154,6 +157,148 @@ public class ActorServiceTest {
 
 
     }
+
+    @Test
+    public void updateActorOnlyUpdatesFilmsWhenGivenOnlyFilms() {
+        Actor actorToUpdate = actors.get(4);
+
+        List<Film> expectedFilms = List.of(films.get(2), films.get(3));
+
+        when(actorRepository.findById(actorToUpdate.getId())).thenReturn(Optional.of(actorToUpdate));
+        when(filmRepository.findById(films.get(2).getId())).thenReturn(Optional.of(films.get(2)));
+        when(filmRepository.findById(films.get(3).getId())).thenReturn(Optional.of(films.get(3)));
+        when(actorRepository.save(any(Actor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Actor updatedActor = service.updateActor(actorToUpdate.getId(), null, null, List.of(films.get(2).getId(), (films.get(3).getId())));
+
+        assertThat(updatedActor).isNotNull();
+        assertThat(updatedActor.getId()).isEqualTo(actorToUpdate.getId());
+        assertThat(updatedActor.getFirstName()).isEqualTo(actorToUpdate.getFirstName());
+        assertThat(updatedActor.getLastName()).isEqualTo(actorToUpdate.getLastName());
+        assertThat(updatedActor.getFilms()).usingRecursiveComparison().isEqualTo(expectedFilms);
+
+    }
+
+    @Test
+    public void updateActorOnlyUpdatesNamesWhenOnlyNameGives() {
+        Actor actorToUpdate = actors.get(2);
+
+        String newFirstName = "John";
+
+        when(actorRepository.findById(actorToUpdate.getId())).thenReturn(Optional.of(actorToUpdate));
+        when(actorRepository.save(any(Actor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Actor updatedActor = service.updateActor(actorToUpdate.getId(), newFirstName, null, List.of());
+
+        assertThat(updatedActor).isNotNull();
+        assertThat(updatedActor.getId()).isEqualTo(actorToUpdate.getId());
+        assertThat(updatedActor.getFirstName()).isEqualTo(newFirstName);
+        assertThat(updatedActor.getLastName()).isEqualTo(actorToUpdate.getLastName());
+        assertThat(updatedActor.getFilms()).usingRecursiveComparison().isEqualTo(actorToUpdate.getFilms());
+
+
+    }
+
+    @Test
+    public void updateActorsThrowsErrorForNonexistentFilmIds() {
+        Actor actorToUpdate = actors.get(3);
+
+        Short nonExistentFilmId = 856;
+
+        when(actorRepository.findById(actorToUpdate.getId())).thenReturn(Optional.of(actorToUpdate));
+        when(filmRepository.findById(nonExistentFilmId)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> {
+            service.updateActor(actorToUpdate.getId(), null, null, List.of(nonExistentFilmId));
+        });
+
+        verify(actorRepository).findById(actorToUpdate.getId());
+        verify(filmRepository).findById(nonExistentFilmId);
+
+
+    }
+
+    @Test
+    public void createActorThrowsErrorForNonexistentFilmIds() {
+        Short nonExistentFilmId = 856;
+        String mockFirstName = "Gbenga";
+        String mockLastName = "Kitombo";
+
+        when(filmRepository.findById(nonExistentFilmId)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> {
+            service.createActor(mockFirstName, mockLastName,  List.of(nonExistentFilmId));
+        });
+
+        verify(filmRepository).findById(nonExistentFilmId);
+    }
+
+    @Test
+    public void deleteActorDeletesActorForValidId() {
+        Actor actorToDelete = actors.get(0);
+        when(actorRepository.existsById(actorToDelete.getId())).thenReturn(true);
+        service.deleteActor(actorToDelete.getId());
+        verify(actorRepository).deleteById(actorToDelete.getId());
+        verify(filmActorRepository).deleteByActorId(actorToDelete.getId());
+    }
+
+    @Test
+    public void updateActorThrowsErrorForNonexistentActor() {
+        Short nonExistentId = 784;
+
+        when(actorRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () ->  {
+            service.updateActor(nonExistentId, null, null, null);
+        });
+
+        verify(actorRepository).findById(nonExistentId);
+    }
+
+    @Test
+    public void deleteActorThrowsErrorForActorThatDoesntExist() {
+        Short nonExistentId = 99;
+
+        when(actorRepository.existsById(nonExistentId)).thenReturn(false);
+
+        assertThrows(ResponseStatusException.class, () -> {
+            service.deleteActor(nonExistentId);
+        });
+
+        verify(actorRepository, never()).deleteById(nonExistentId);
+    }
+
+    @Test
+    public void getActorByIdReturnsActorGivenValidId() {
+        Actor validActor = actors.get(3);
+
+        when(actorRepository.findById(validActor.getId())).thenReturn(Optional.of(validActor));
+
+        Actor returnedActor = service.getActorById(validActor.getId());
+
+        assertNotNull(returnedActor);
+        assertThat(returnedActor.getId()).isEqualTo(validActor.getId());
+        assertThat(returnedActor.getFirstName()).isEqualTo(validActor.getFirstName());
+        assertThat(returnedActor.getLastName()).isEqualTo(validActor.getLastName());
+        assertThat(returnedActor.getFilms()).usingRecursiveComparison().isEqualTo(validActor.getFilms());
+        verify(actorRepository).findById(validActor.getId());
+    }
+
+    @Test
+    public void getActorByIdThrowsErrorForInvalidId() {
+        Short invalidId = 999;
+
+        when(actorRepository.findById(invalidId)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> {
+            service.getActorById(invalidId);
+        });
+
+        verify(actorRepository).findById(invalidId);
+    }
+
+
+
 
 
 

@@ -10,9 +10,11 @@ import com.pilot.sakila.entities.Watchlist;
 import com.pilot.sakila.enums.Rating;
 import com.pilot.sakila.services.FilmService;
 import com.pilot.sakila.services.WatchlistService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
@@ -160,4 +162,34 @@ public class WatchlistControllerTest {
         assertThat(actualWatchlist).usingRecursiveComparison().isEqualTo(expectedWatchlist);
 
     }
+
+    @Test
+    public void removeFilmFromWatchlistReturnsWatchlistResponseForUpdatedWatchlist() {
+        Short watchlistId = watchlists.get(0).getId();
+        Short filmId = films.get(0).getId();
+        Watchlist mockWatchlist = watchlists.get(0);
+
+        WatchlistResponse expectedWatchlist = WatchlistResponse.from(mockWatchlist);
+
+        doReturn(mockWatchlist).when(wService).removeFilmFromWatchlist(watchlistId, filmId);
+
+        WatchlistResponse actualWatchlist = controller.removeFromWatchlist(watchlistId, filmId);
+
+        assertNotNull(actualWatchlist);
+        assertThat(actualWatchlist).usingRecursiveComparison().isEqualTo(expectedWatchlist);
+    }
+
+    @Test
+    public void deleteActorDeletesActorGivenValidActorId(){
+        Short watchlistId = 2;
+        ResponseEntity<String> expectedMessage = ResponseEntity.ok("Watchlist successfully deleted");;
+
+
+        ResponseEntity<String> actualMessage = controller.deleteWatchlist(watchlistId);
+
+        assertNotNull(actualMessage);
+        Assertions.assertEquals(expectedMessage.getStatusCode(), actualMessage.getStatusCode());
+        Assertions.assertEquals(expectedMessage, actualMessage);
+    }
+
 }

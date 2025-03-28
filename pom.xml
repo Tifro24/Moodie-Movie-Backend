@@ -119,6 +119,8 @@
 						<exclude>**/dto/**/*.*</exclude>
 						<exclude>**/entities/**.*</exclude>
 						<exclude>**/repositories/**.*</exclude>
+						<exclude>**/enums//**.*</exclude>
+						<exclude>**/converters/**.*</exclude>
 						<exclude>**/*Application.*</exclude>
 					</excludes>
 				</configuration>
